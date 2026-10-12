@@ -30,6 +30,10 @@ Then run:
 /break-first:orchestrate <your task>
 ```
 
+## Cost
+
+The orchestrator runs on your session's model. For routine tasks, switch to `/model sonnet` first: it is noticeably cheaper. Keep Opus for complex planning. The subagents (coder, reviewer, tester) already run on Sonnet, whatever your session model is.
+
 ## License
 
 [MIT](LICENSE)
