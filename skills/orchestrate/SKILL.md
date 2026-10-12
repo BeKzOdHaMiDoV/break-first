@@ -13,7 +13,7 @@ Task: $ARGUMENTS
 
 1. **Save tokens.** Don't spawn a subagent for a small fix you may do yourself (see step 5). Give each subagent exactly the context it needs, no more. Don't re-read files the subagents wrote unless a check fails.
 2. **Code gets better, not bigger.** Plan the smallest change that solves the task. Prefer reuse and deletion over new layers. Reject plans that add code without a reason.
-3. **Stay inside the task.** Only files the task needs get touched. Never let a step reformat, rename or "clean up" unrelated user files. Search for files only inside the project folder (the folder the task names, or the current project): set Glob/Grep `path` to that folder instead of putting it only in the pattern, and never search the whole home directory or drive. Temporary files (scratch data, smoke-test files) go only inside the project folder and are deleted when done; never in `C:\Temp`, `/tmp` or other system folders. Tell subagents the project folder in every brief.
+3. **Stay inside the task.** Only files the task needs get touched. Never let a step reformat, rename or "clean up" unrelated user files. Search for files only inside the project folder (the folder the task names, or the current project): set Glob/Grep `path` to that folder instead of putting it only in the pattern, and never search the whole home directory or drive. Temporary files (scratch data, smoke-test files) go only inside the project folder and are deleted when done; never in `C:\Temp`, `/tmp` or other system folders. Tell subagents the project folder in every brief. Neither you nor any subagent reads anything outside the project folder: no other projects, no files in the home directory, no Claude memory, settings or other config files, even if your context mentions them. Don't copy conventions from other folders.
 
 ## Iron limits for security work
 
@@ -28,7 +28,7 @@ These apply to you and to every subagent, and go into every red-team brief:
 - **Trivial** — a small edit that doesn't change logic: typo in text or a comment, rename, message wording, a config value. Do it yourself with Read/Edit. No subagents (run existing tests yourself if there are any). Then skip to step 7.
 - **Bug fix** — code behaves wrongly, even if the fix is one line. A test must catch the bug so it can't come back. Skip to step 4 in **reproduce** mode.
 - **Check request** — the user explicitly asks to check, test or verify code. Skip to step 4 in **check** mode.
-- **Security check** — the user asks only for a security check of existing code. Skip to step 6.
+- **Security check** — the user asks only for a security check of existing code. Run the existing tests yourself; if any fail, report that to the user instead of attacking. Then go to step 6.
 - **Real** — anything that adds new behavior (a new function, module or feature, even a small one), touches several files, or has non-obvious logic: continue. New behavior always gets tested.
 
 A check request that turns up a bug follows the same fix rounds; it doesn't need a separate bug-fix pass.
@@ -75,7 +75,7 @@ Call these in parallel; neither touches project code.
 If tests fail or the reviewer reports issues worth fixing, run a fix round:
 
 1. Decide which review items to apply: logic errors always; simplifications when they clearly make the code smaller or clearer. Drop the rest and mention them in the report.
-2. Send the coder **only** the failing test names and causes plus the chosen review items (problem, file:line, suggested fix), in one message. No full test output, no test code. Prefer continuing the same coder with SendMessage, since it still has the context; otherwise (or in reproduce/check mode) start a new coder with the files, the problems and the correct behavior. Exception: you may fix a small thing yourself — up to 5 lines in one place. It still counts as a fix round and is reported as one. Anything bigger goes to the coder. You never write or change tests; that is the tester's job only.
+2. Send the coder **only** the failing test names and causes plus the chosen review items (problem, file:line, suggested fix), in one message. No full test output, no test code. Prefer continuing the same coder with SendMessage, since it still has the context; otherwise (or in reproduce/check mode) start a new coder with the files, the problems and the correct behavior. Exception: you may fix a small thing yourself — up to 5 lines in one place (never a security fix, see step 6). It still counts as a fix round and is reported as one. Anything bigger goes to the coder. You never write or change tests; that is the tester's job only.
 3. If the round fixed logic errors found by the reviewer, they are bugs: ask the tester to add one test per fixed error that catches it (describe the wrong and the correct behavior). No other new tests.
 4. Re-run the tests yourself. Don't re-run the reviewer unless the fix rewrote large parts of the code.
 
@@ -85,11 +85,19 @@ If tests fail or the reviewer reports issues worth fixing, run a fix round:
 
 ## 6. Red-team
 
-Call `subagent_type: "break-first:red-team"` once the code is ready and all tests are green, after **Real** tasks and security checks. Skip it for trivial edits, and for bug-fix/check mode unless the code handles input, auth, sessions, files, commands or secrets. Brief it with the project folder, the goal of the code, the files to attack, the test command, and the iron limits above.
+**Hard gate — all of these must be true before you call the red-team:**
+
+1. No coder, reviewer or tester is still running, and no fix round is in progress.
+2. You yourself ran the **whole** test suite after the last change to code or tests, and **every** test passed.
+3. If anything changes after that run (a fix, a new test), run the suite again and pass this gate again.
+
+Never start the red-team in parallel with another agent, and never on red or unverified tests.
+
+Call `subagent_type: "break-first:red-team"` after **Real** tasks and security checks, once the gate is passed. Skip it for trivial edits, and for bug-fix/check mode unless the code handles input, auth, sessions, files, commands or secrets. Brief it with the project folder, the goal of the code, the files to attack, the test command, and the iron limits above.
 
 - **NO HOLES / CLEAN** → step 7.
 - **HOLES** → security round, at most **2**:
-  1. Send the coder each proven hole: short name, file:line, the attack test that proves it, why it is dangerous. No attack code. The coder fixes the project code, never the attack tests.
+  1. Send the coder each proven hole: short name, file:line, the attack test that proves it, why it is dangerous. No attack code. The coder fixes the project code, never the attack tests. **Security fixes are always made by the coder**, however small: the 5-line exception from step 5 does not apply here.
   2. Run the whole test suite yourself, including the attack tests; regular tests must stay green.
   3. Ask the red-team to re-check (continue it with SendMessage if possible): re-run its attacks and try to bypass the fix.
 - Still open after 2 rounds → stop and report the list of open holes to the user.

@@ -20,7 +20,7 @@ If a check would break a limit, don't run it: describe it as a hypothesis in `NO
 
 1. **Save tokens.** Scanners first, they cost nothing. Read only the code that handles input, auth, files, data or commands. No long explanations, no pasted code in your reply.
 2. **Code gets better, not bigger.** Report real, proven holes, not a checklist of theoretical best practices. One focused attack test per hole.
-3. **Stay inside the task.** You never change project code. You create and edit only attack test files (e.g. `test_attack_<topic>.py`) in the project folder.
+3. **Stay inside the task.** You never change project code. You create and edit only attack test files (e.g. `test_attack_<topic>.py`) in the project folder. Never read anything outside the project folder either: no other projects, no files in the home directory, no Claude memory, settings or other config files, even if your context mentions them.
 
 ## How you work
 
