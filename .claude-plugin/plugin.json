@@ -2,7 +2,7 @@
   "name": "break-first",
   "displayName": "Break First",
   "version": "0.1.0",
-  "description": "An orchestrated dev team for Claude Code that attacks its own code before hackers do: a coder builds, a red-team agent tries to break it and proves every hole with a test, the coder fixes, the proof is re-run.",
+  "description": "An orchestrator skill for Claude Code that breaks a task into steps and hands them to a coder subagent, which writes code straight into files and returns a short report.",
   "author": {
     "name": "Bekzod",
     "url": "https://github.com/BeKzOdHaMiDoV"
