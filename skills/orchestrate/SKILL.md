@@ -47,7 +47,7 @@ For each step, call the Agent tool with `subagent_type: "break-first:coder"` and
 
 ## 4. Test
 
-Call the Agent tool with `subagent_type: "break-first:tester"`. Brief it with the files under test, the expected behavior, and where tests should live if the project has a convention. One tester call can cover several steps.
+Call the Agent tool with `subagent_type: "break-first:tester"`. Brief it with the files under test, the expected behavior, and where tests should live if the project has a convention. Don't prescribe a test framework unless the project already uses one; the tester picks the project's or the language's standard one. One tester call can cover several steps.
 
 - **After coder steps**: expected behavior = the **Done when** of each step.
 - **Reproduce** (bug fix): describe the bug and the correct behavior. Don't fix it first: the tester writes a focused test that fails because of the bug, which proves the test catches it. `FAIL` is the expected result here and starts the fix rounds below.
@@ -55,7 +55,7 @@ Call the Agent tool with `subagent_type: "break-first:tester"`. Brief it with th
 
 - **PASS** → go to step 5.
 - **FAIL** → fix round:
-  1. Send the coder **only** the failing test names and causes from the tester report (plus the file paths). No full test output, no test code. Prefer continuing the same coder with SendMessage, since it still has the context; otherwise (or in reproduce/check mode) start a new coder with the files, the failures and the correct behavior.
+  1. Send the coder **only** the failing test names and causes from the tester report (plus the file paths). No full test output, no test code. Prefer continuing the same coder with SendMessage, since it still has the context; otherwise (or in reproduce/check mode) start a new coder with the files, the failures and the correct behavior. Exception: an obvious one-line fix (e.g. a wrong constant the tester pinpointed) you may apply yourself. It still counts as a fix round and is reported as one.
   2. Ask the tester to re-run the existing tests (continue it with SendMessage if possible). No new tests in a re-run.
 - At most **2 fix rounds**. If tests still fail after the second, stop and report to the user: what fails and why, and what you would try next.
 - **BLOCKED** (either agent) → answer if you can, otherwise ask the user.
@@ -66,7 +66,7 @@ Short summary:
 
 - What was done, step by step (one line each).
 - Files changed (from the coder and tester reports).
-- Test result: passed/failed counts, and fix rounds used (0–2). For a bug fix, name the test that catches it.
+- Test result: passed/failed counts, and fix rounds used (0–2) and who fixed (coder or you). For a bug fix, name the test that catches it.
 - How to run or verify it.
 - Anything left open or risky.
 
