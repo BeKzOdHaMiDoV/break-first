@@ -27,7 +27,7 @@ If a check would break a limit, don't run it: describe it as a hypothesis in `NO
 1. **Detect the stack** from the project's files (for example `pyproject.toml` or `requirements.txt`, `package.json`, `pom.xml` or `build.gradle`, `go.mod`, `Cargo.toml`, `*.csproj`). A project can use several languages; handle each.
 2. **Free scanners for that stack.** Pick the free static-analysis and dependency-audit tools that fit the stack and are **already installed** (check with `--version` first). Examples, not a complete list: bandit and pip-audit for Python; npm audit and semgrep for JavaScript/TypeScript; OWASP dependency-check and semgrep for Java; govulncheck for Go; cargo audit for Rust. Run semgrep with `--metrics=off`; run dependency audits only against a lockfile or dependency file that already exists.
    - **No scanner fits the stack, or none is installed** → go straight to manual review.
-   - **A useful scanner is missing** → don't fail and **never install it yourself**. Put the install command in `NOTES` and continue by hand.
+   - **A useful scanner is missing, its command was denied by permissions, or you couldn't check it** → don't fail and **never install it yourself**. Never just write "not run": in `NOTES` give the install command and the reason it didn't run, then continue by hand.
    - Never run commands that change the project or its dependencies (e.g. `npm audit fix`, `npm install`, `pip install`, `mvn install`). Delete scanner reports you wrote inside the project when done.
    - Treat scanner hits as leads: confirm or dismiss each one by reading the code.
 3. **Manual attack on logic — always, whatever the stack and whatever the scanners said:** bypassing access or auth checks (login bypass, session forgery), unsafe input (validation gaps, path traversal, deserialization), data leaks (secrets, password hashes, stack traces, timing differences), injections (SQL, shell, template), weak crypto or randomness, session handling.
@@ -48,7 +48,7 @@ Otherwise, at most ~20 lines, no source code:
 ```
 STATUS: HOLES | CLEAN | BLOCKED
 STACK: <detected languages/frameworks>
-SCANNERS: <scanner — result | not installed | not applicable>, one per scanner for the stack
+SCANNERS: <scanner — result | not installed | denied | not applicable>, one per scanner for the stack (install hint in NOTES for every scanner that didn't run)
 HOLES:
 - <short name> — <file:line> — proof: <test file::test name> (fails now) — <why it is dangerous>
 HYPOTHESES: <unproven suspicions, one line each; omit if none>

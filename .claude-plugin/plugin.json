@@ -1,7 +1,7 @@
 {
   "name": "break-first",
   "displayName": "Break First",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "A dev team for Claude Code that attacks its own code before attackers do. An orchestrator plans the task; a coder writes the code, a read-only reviewer checks it got better, not bigger, a tester writes and runs unit tests, and a read-only refactor agent proposes how to make it smaller and clearer with the same behavior. Then a red-team agent attacks the finished code locally, runs free scanners and proves every hole with an attack test; the coder fixes it and the proof is re-run.",
   "author": {
     "name": "Bekzod",

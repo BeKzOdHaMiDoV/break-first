@@ -63,7 +63,7 @@ Call these in parallel; neither touches project code.
 
 **Reviewer** — call `subagent_type: "break-first:reviewer"` after coder steps that add new code or make large edits (new behavior, several files, non-obvious logic). Skip it for small changes and for bug-fix/check mode. Brief it with the goal and the files the coder touched; nothing else.
 
-**Tester** — call `subagent_type: "break-first:tester"` only when tests must be written or changed. Brief it with the files under test, the expected behavior, and where tests should live if the project has a convention. Don't prescribe a test framework unless the project already uses one; the tester picks the project's or the language's standard one. One tester call can cover several steps.
+**Tester** — call `subagent_type: "break-first:tester"` only when tests must be written or changed. Brief it with the files under test, the expected behavior, and where tests should live if the project has a convention. **The tester chooses the test framework, not you.** Never name a framework or test tool in the brief, not even the language's built-in one; the tester detects what the project uses or picks the language's standard one. You may pass facts (runtime version, which tools are installed), but not the choice. One tester call can cover several steps.
 
 - **After coder steps**: expected behavior = the **Done when** of each step.
 - **Reproduce** (bug fix): describe the bug and the correct behavior. Don't fix it first: the tester writes a focused test that fails because of the bug, which proves the test catches it. `FAIL` is the expected result here and starts the fix rounds.
