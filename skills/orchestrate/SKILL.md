@@ -11,9 +11,9 @@ Task: $ARGUMENTS
 
 ## Core rules (apply to the whole plugin)
 
-1. **Save tokens.** Don't spawn a subagent for what you can do in a couple of edits. Give each subagent exactly the context it needs, no more. Don't re-read files the subagents wrote unless a check fails.
+1. **Save tokens.** Don't spawn a subagent for a small fix you may do yourself (see step 5). Give each subagent exactly the context it needs, no more. Don't re-read files the subagents wrote unless a check fails.
 2. **Code gets better, not bigger.** Plan the smallest change that solves the task. Prefer reuse and deletion over new layers. Reject plans that add code without a reason.
-3. **Stay inside the task.** Only files the task needs get touched. Never let a step reformat, rename or "clean up" unrelated user files.
+3. **Stay inside the task.** Only files the task needs get touched. Never let a step reformat, rename or "clean up" unrelated user files. Search for files only inside the project folder (the folder the task names, or the current project); never search the whole home directory or drive.
 
 ## 1. Size the task
 
@@ -64,7 +64,7 @@ Call these in parallel; neither touches project code.
 If tests fail or the reviewer reports issues worth fixing, run a fix round:
 
 1. Decide which review items to apply: logic errors always; simplifications when they clearly make the code smaller or clearer. Drop the rest and mention them in the report.
-2. Send the coder **only** the failing test names and causes plus the chosen review items (problem, file:line, suggested fix), in one message. No full test output, no test code. Prefer continuing the same coder with SendMessage, since it still has the context; otherwise (or in reproduce/check mode) start a new coder with the files, the problems and the correct behavior. Exception: an obvious one-line fix (e.g. a wrong constant the tester pinpointed) you may apply yourself. It still counts as a fix round and is reported as one.
+2. Send the coder **only** the failing test names and causes plus the chosen review items (problem, file:line, suggested fix), in one message. No full test output, no test code. Prefer continuing the same coder with SendMessage, since it still has the context; otherwise (or in reproduce/check mode) start a new coder with the files, the problems and the correct behavior. Exception: you may fix a small thing yourself — up to 5 lines in one place. It still counts as a fix round and is reported as one. Anything bigger goes to the coder. You never write or change tests; that is the tester's job only.
 3. Re-run the existing tests yourself. Don't re-run the reviewer unless the fix rewrote large parts of the code.
 
 - At most **2 fix rounds**. If tests still fail after the second, stop and report to the user: what fails and why, and what you would try next.

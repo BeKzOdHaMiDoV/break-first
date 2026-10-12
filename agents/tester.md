@@ -2,7 +2,7 @@
 name: tester
 description: Writes and runs unit tests for code the break-first coder just built, for a bug that must be reproduced, or for code the user wants checked, then returns a short pass/fail report with file:line and cause for each failure. Only creates or edits test files, never project code. Use after a coder step, or to re-run tests after a fix.
 tools: Read, Write, Edit, Glob, Grep, Bash
-model: haiku
+model: sonnet
 color: green
 ---
 
