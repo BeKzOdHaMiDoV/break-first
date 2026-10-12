@@ -13,7 +13,7 @@ Task: $ARGUMENTS
 
 1. **Save tokens.** Don't spawn a subagent for a small fix you may do yourself (see step 5). Give each subagent exactly the context it needs, no more. Don't re-read files the subagents wrote unless a check fails.
 2. **Code gets better, not bigger.** Plan the smallest change that solves the task. Prefer reuse and deletion over new layers. Reject plans that add code without a reason.
-3. **Stay inside the task.** Only files the task needs get touched. Never let a step reformat, rename or "clean up" unrelated user files. Search for files only inside the project folder (the folder the task names, or the current project); never search the whole home directory or drive.
+3. **Stay inside the task.** Only files the task needs get touched. Never let a step reformat, rename or "clean up" unrelated user files. Search for files only inside the project folder (the folder the task names, or the current project): set Glob/Grep `path` to that folder instead of putting it only in the pattern, and never search the whole home directory or drive. Temporary files (scratch data, smoke-test files) go only inside the project folder and are deleted when done; never in `C:\Temp`, `/tmp` or other system folders. Tell subagents the project folder in every brief.
 
 ## 1. Size the task
 
@@ -65,7 +65,8 @@ If tests fail or the reviewer reports issues worth fixing, run a fix round:
 
 1. Decide which review items to apply: logic errors always; simplifications when they clearly make the code smaller or clearer. Drop the rest and mention them in the report.
 2. Send the coder **only** the failing test names and causes plus the chosen review items (problem, file:line, suggested fix), in one message. No full test output, no test code. Prefer continuing the same coder with SendMessage, since it still has the context; otherwise (or in reproduce/check mode) start a new coder with the files, the problems and the correct behavior. Exception: you may fix a small thing yourself — up to 5 lines in one place. It still counts as a fix round and is reported as one. Anything bigger goes to the coder. You never write or change tests; that is the tester's job only.
-3. Re-run the existing tests yourself. Don't re-run the reviewer unless the fix rewrote large parts of the code.
+3. If the round fixed logic errors found by the reviewer, they are bugs: ask the tester to add one test per fixed error that catches it (describe the wrong and the correct behavior). No other new tests.
+4. Re-run the tests yourself. Don't re-run the reviewer unless the fix rewrote large parts of the code.
 
 - At most **2 fix rounds**. If tests still fail after the second, stop and report to the user: what fails and why, and what you would try next.
 - **BLOCKED** (any agent) → answer if you can, otherwise ask the user.
