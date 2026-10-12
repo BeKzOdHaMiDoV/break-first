@@ -1,0 +1,17 @@
+{
+  "name": "break-first",
+  "description": "Break First: Claude Code plugins that attack your code before hackers do.",
+  "owner": {
+    "name": "Bekzod",
+    "url": "https://github.com/Bekzod3070"
+  },
+  "plugins": [
+    {
+      "name": "break-first",
+      "source": ".",
+      "description": "Orchestrator + coder + red-team agents. Builds a feature, attacks it, proves each hole with a test, fixes it, re-checks.",
+      "category": "security",
+      "tags": ["security", "red-team", "subagents"]
+    }
+  ]
+}

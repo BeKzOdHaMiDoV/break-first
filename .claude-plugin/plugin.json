@@ -1,0 +1,15 @@
+{
+  "name": "break-first",
+  "displayName": "Break First",
+  "version": "0.1.0",
+  "description": "An orchestrated dev team for Claude Code that attacks its own code before hackers do: a coder builds, a red-team agent tries to break it and proves every hole with a test, the coder fixes, the proof is re-run.",
+  "author": {
+    "name": "Bekzod",
+    "email": "bham30700@gmail.com",
+    "url": "https://github.com/Bekzod3070"
+  },
+  "homepage": "https://github.com/Bekzod3070/break-first",
+  "repository": "https://github.com/Bekzod3070/break-first",
+  "license": "MIT",
+  "keywords": ["security", "red-team", "orchestrator", "subagents", "pentest", "code-review"]
+}
