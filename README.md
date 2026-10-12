@@ -14,7 +14,7 @@ A plugin for [Claude Code](https://code.claude.com) that attacks your own code b
 - **`break-first:tester`** (subagent): writes unit tests against the expected behavior, runs them, and reports passed/failed counts with file:line and cause for each failure. It only touches test files, never project code.
 
 - **`break-first:refactor`** (subagent, read-only): after the code works, looks at new or heavily changed code for duplication, dead code, needless complexity and overlong functions. Its one question: how to make the code smaller and clearer with exactly the same behavior? Reports place → problem → proposal, or a single `NOTHING TO SIMPLIFY` line.
-- **`break-first:red-team`** (subagent): attacks only the current project's code, locally. First detects the project's stack and runs the free scanners that fit it, if they are already installed: `bandit` and `pip-audit` for Python, `npm audit` and `semgrep` for JavaScript/TypeScript, OWASP `dependency-check` and `semgrep` for Java. It never installs a scanner itself: if one is missing, it tells you how to install it and goes on by hand. Other stacks go straight to manual review. Then it always looks for logic holes scanners miss: access-check bypass, unsafe input, data leaks, injections. Every hole must be proven by an attack test that fails while the hole exists; anything unproven is reported as a hypothesis. It never edits project code.
+- **`break-first:red-team`** (subagent): attacks only the current project's code, locally. First detects the project's stack and runs the free scanners that fit it, if they are already installed (for example `bandit`/`pip-audit`, `npm audit`, `semgrep`, OWASP `dependency-check`). It never installs a scanner itself: if one is missing, it tells you how to install it and goes on by hand. Then it always looks for logic holes scanners miss: access-check bypass, unsafe input, data leaks, injections. Every hole must be proven by an attack test that fails while the hole exists; anything unproven is reported as a hypothesis. It never edits project code.
 
 Shared rules: save tokens, make code better rather than bigger, and touch nothing outside the task.
 
@@ -22,7 +22,15 @@ Security limits: the red-team attacks only the project from the task, never runs
 
 ## Languages
 
-The orchestrator, coder, reviewer, tester and refactor agents work with any language: they use the project's own tools and test framework (or the language's standard one). The red-team's scanners cover Python, JavaScript/TypeScript and Java; for other stacks it relies on manual review and attack tests only. So far the plugin has been tested live on Python projects.
+break-first is not tied to one language. It detects the project's stack and uses that stack's own tools:
+
+- **Tests:** the test framework the project already uses, otherwise the language's standard one (for example pytest, Jest or Vitest, JUnit, go test).
+- **Build and checks:** the project's own build, run and lint commands.
+- **Security scanners:** free scanners that fit the stack, if installed (for example bandit/pip-audit, npm audit, semgrep, OWASP dependency-check). With no scanner, the red-team relies on manual review and attack tests, which it does on every stack anyway.
+
+If a tool is missing, no agent installs it silently: you get the install command, and the work continues with what is available.
+
+So far the plugin has been tested live on Python projects.
 
 ## Install
 
