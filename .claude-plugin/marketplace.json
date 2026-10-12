@@ -9,7 +9,7 @@
     {
       "name": "break-first",
       "source": ".",
-      "description": "Orchestrator + coder, reviewer, tester and red-team agents. Builds a feature, tests it, attacks it locally, proves each hole with a test, fixes it, re-checks.",
+      "description": "Orchestrator + coder, reviewer, tester, refactor and red-team agents. Builds a feature, tests it, simplifies it, attacks it locally, proves each hole with a test, fixes it, re-checks.",
       "category": "productivity",
       "tags": ["security", "red-team", "orchestrator", "subagents"]
     }

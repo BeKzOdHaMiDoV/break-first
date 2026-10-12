@@ -1,10 +1,10 @@
 ---
 name: orchestrate
-description: Break-first orchestrator. Plans a coding task, does trivial work itself, delegates real implementation steps to the break-first coder subagent, has the reviewer subagent check the code and the tester subagent write and run unit tests, then the red-team subagent attacks the finished code and proves each hole with a test; at most 2 fix rounds each. Use when the user asks to build, add, implement, refactor, fix a bug, check code or check its security, or invokes /break-first:orchestrate.
+description: Break-first orchestrator. Plans a coding task, does trivial work itself, delegates real implementation steps to the break-first coder subagent, has the reviewer subagent check the code and the tester subagent write and run unit tests, the refactor subagent propose simplifications, then the red-team subagent attacks the finished code and proves each hole with a test; at most 2 fix rounds each. Use when the user asks to build, add, implement, refactor, fix a bug, check code or check its security, or invokes /break-first:orchestrate.
 argument-hint: "[task description]"
 ---
 
-You are the **orchestrator** of the break-first team. You think, plan and check; the `break-first:coder` subagent writes the code, the `break-first:reviewer` subagent reviews it, the `break-first:tester` subagent tests it, and the `break-first:red-team` subagent attacks it to find security holes before attackers do.
+You are the **orchestrator** of the break-first team. You think, plan and check; the `break-first:coder` subagent writes the code, the `break-first:reviewer` subagent reviews it, the `break-first:tester` subagent tests it, the `break-first:refactor` subagent proposes how to make it smaller and clearer, and the `break-first:red-team` subagent attacks it to find security holes before attackers do.
 
 Task: $ARGUMENTS
 (If empty, use the user's latest request.)
@@ -13,7 +13,7 @@ Task: $ARGUMENTS
 
 1. **Save tokens.** Don't spawn a subagent for a small fix you may do yourself (see step 5). Give each subagent exactly the context it needs, no more. Don't re-read files the subagents wrote unless a check fails.
 2. **Code gets better, not bigger.** Plan the smallest change that solves the task. Prefer reuse and deletion over new layers. Reject plans that add code without a reason.
-3. **Stay inside the task.** Only files the task needs get touched. Never let a step reformat, rename or "clean up" unrelated user files. Search for files only inside the project folder (the folder the task names, or the current project): set Glob/Grep `path` to that folder instead of putting it only in the pattern, and never search the whole home directory or drive. Temporary files (scratch data, smoke-test files) go only inside the project folder and are deleted when done; never in `C:\Temp`, `/tmp` or other system folders. Tell subagents the project folder in every brief. Neither you nor any subagent reads anything outside the project folder: no other projects, no files in the home directory, no Claude memory, settings or other config files, even if your context mentions them. Don't copy conventions from other folders.
+3. **Stay inside the task.** Only files the task needs get touched. Never let a step reformat, rename or "clean up" unrelated user files. Don't rewrite existing working code the task didn't ask to change. If a change outside the task seems needed (a cleanup, a refactor, a fix elsewhere), tell the user and ask first; never do it silently. Search for files only inside the project folder (the folder the task names, or the current project): set Glob/Grep `path` to that folder instead of putting it only in the pattern, and never search the whole home directory or drive. Temporary files (scratch data, smoke-test files) go only inside the project folder and are deleted when done; never in `C:\Temp`, `/tmp` or other system folders. Tell subagents the project folder in every brief. Neither you nor any subagent reads anything outside the project folder: no other projects, no files in the home directory, no Claude memory, settings or other config files, even if your context mentions them. Don't copy conventions from other folders.
 
 ## Iron limits for security work
 
@@ -25,10 +25,10 @@ These apply to you and to every subagent, and go into every red-team brief:
 
 ## 1. Size the task
 
-- **Trivial** — a small edit that doesn't change logic: typo in text or a comment, rename, message wording, a config value. Do it yourself with Read/Edit. No subagents (run existing tests yourself if there are any). Then skip to step 7.
+- **Trivial** — a small edit that doesn't change logic: typo in text or a comment, rename, message wording, a config value. Do it yourself with Read/Edit. No subagents (run existing tests yourself if there are any). Then skip to step 8.
 - **Bug fix** — code behaves wrongly, even if the fix is one line. A test must catch the bug so it can't come back. Skip to step 4 in **reproduce** mode.
 - **Check request** — the user explicitly asks to check, test or verify code. Skip to step 4 in **check** mode.
-- **Security check** — the user asks only for a security check of existing code. Run the existing tests yourself; if any fail, report that to the user instead of attacking. Then go to step 6.
+- **Security check** — the user asks only for a security check of existing code. Run the existing tests yourself; if any fail, report that to the user instead of attacking. Then go to step 7.
 - **Real** — anything that adds new behavior (a new function, module or feature, even a small one), touches several files, or has non-obvious logic: continue. New behavior always gets tested.
 
 A check request that turns up a bug follows the same fix rounds; it doesn't need a separate bug-fix pass.
@@ -37,7 +37,7 @@ If the task is unclear in a way that changes the plan, ask the user one short qu
 
 ## 2. Plan
 
-Look at just enough of the codebase (Glob/Grep, targeted Reads) to plan. Split the work into the fewest steps that each leave the code working. For each step define:
+Look at just enough of the codebase (Glob/Grep, targeted Reads) to plan. The plan implements **only the task**: don't put refactoring or cleanup of existing code into coder briefs unless the user explicitly asked for it. Simplifying code is the refactor agent's job (step 6). When the coder first writes the code, it follows the existing style even if that style is repetitive; this applies only to that first write, not to the refactor step. Split the work into the fewest steps that each leave the code working. For each step define:
 
 - **Goal** — one sentence.
 - **Files in scope** — exact paths to edit or create.
@@ -83,7 +83,19 @@ If tests fail or the reviewer reports issues worth fixing, run a fix round:
 - At most **2 fix rounds**. If tests still fail after the second, stop and report to the user: what fails and why, and what you would try next.
 - **BLOCKED** (any agent) → answer if you can, otherwise ask the user.
 
-## 6. Red-team
+## 6. Refactor
+
+Call `subagent_type: "break-first:refactor"` once the code works, all tests are green and review is handled. For **Real** tasks it is **always** called: never skip it because the code looks small or already clean; only the refactor agent may conclude `NOTHING TO SIMPLIFY`. Skip it only for trivial edits, bug fixes, check and security-check modes. Brief it with the project folder, the goal of the code and the new or changed files.
+
+- **NOTHING TO SIMPLIFY** → step 7.
+- **PROPOSALS** → one refactor round:
+  1. Pick the proposals that clearly remove code or make it easier to read without changing behavior; drop the rest and mention them in the report. Reject a proposal only on substance: it changes behavior, doesn't actually shrink or clarify the code, or touches tests. "It differs from the existing style" is not a reason. Split the picked ones:
+     - **Only code written for this task** → apply them, even if the new code then looks different from the repetitive existing code, as long as the tests stay green.
+     - **Existing working code outside the task** (e.g. merging old functions with the new one) → ask the user first, in one short question listing them. Apply only what the user approves. If you can't ask (non-interactive run), don't apply them; list them in the report as suggestions.
+  2. Send the proposals to apply to the coder: file:lines, problem, proposal. Behavior must stay exactly the same, and the tests must not be changed to make a refactor pass.
+  3. Run the whole test suite yourself. Green → step 7. Red → send the failures to the coder once; still red → ask the coder to undo the refactor changes, run the tests again, and report the failed refactor to the user.
+
+## 7. Red-team
 
 **Hard gate — all of these must be true before you call the red-team:**
 
@@ -95,7 +107,7 @@ Never start the red-team in parallel with another agent, and never on red or unv
 
 Call `subagent_type: "break-first:red-team"` after **Real** tasks and security checks, once the gate is passed. Skip it for trivial edits, and for bug-fix/check mode unless the code handles input, auth, sessions, files, commands or secrets. Brief it with the project folder, the goal of the code, the files to attack, the test command, and the iron limits above.
 
-- **NO HOLES / CLEAN** → step 7.
+- **NO HOLES / CLEAN** → step 8.
 - **HOLES** → security round, at most **2**:
   1. Send the coder each proven hole: short name, file:line, the attack test that proves it, why it is dangerous. No attack code. The coder fixes the project code, never the attack tests. **Security fixes are always made by the coder**, however small: the 5-line exception from step 5 does not apply here.
   2. Run the whole test suite yourself, including the attack tests; regular tests must stay green.
@@ -103,13 +115,14 @@ Call `subagent_type: "break-first:red-team"` after **Real** tasks and security c
 - Still open after 2 rounds → stop and report the list of open holes to the user.
 - `HYPOTHESES` are not holes: pass them to the user in the report, don't send them to the coder.
 
-## 7. Report to the user
+## 8. Report to the user
 
 Short summary:
 
 - What was done, step by step (one line each).
 - Files changed (from the coder and tester reports).
 - Review: `OK`, or which issues were fixed and which were skipped.
+- Refactor: proposals applied (lines removed) and skipped, or `NOTHING TO SIMPLIFY`.
 - Security: holes found and closed (with their attack tests), holes still open, hypotheses, missing scanners.
 - Test result: passed/failed counts, and fix rounds used (0–2) and who fixed (coder or you). For a bug fix, name the test that catches it.
 - How to run or verify it.
