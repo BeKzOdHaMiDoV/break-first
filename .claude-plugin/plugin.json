@@ -1,8 +1,8 @@
 {
   "name": "break-first",
   "displayName": "Break First",
-  "version": "0.3.2",
-  "description": "An orchestrator skill for Claude Code that breaks a task into steps for a coder subagent, which writes code straight into files. A read-only reviewer subagent checks that the code got better, not bigger, and a tester subagent writes and runs unit tests. All return short reports; problems go back to the coder for at most 2 fix rounds.",
+  "version": "0.4.0",
+  "description": "A dev team for Claude Code that attacks its own code before attackers do. An orchestrator plans the task; a coder writes the code, a read-only reviewer checks it got better, not bigger, and a tester writes and runs unit tests. Then a red-team agent attacks the finished code locally, runs free scanners and proves every hole with an attack test; the coder fixes it and the proof is re-run.",
   "author": {
     "name": "Bekzod",
     "url": "https://github.com/BeKzOdHaMiDoV"
@@ -10,5 +10,5 @@
   "homepage": "https://github.com/BeKzOdHaMiDoV/break-first",
   "repository": "https://github.com/BeKzOdHaMiDoV/break-first",
   "license": "MIT",
-  "keywords": ["orchestrator", "subagents", "productivity"]
+  "keywords": ["security", "red-team", "orchestrator", "subagents", "productivity"]
 }

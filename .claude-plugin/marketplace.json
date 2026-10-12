@@ -1,6 +1,6 @@
 {
   "name": "break-first",
-  "description": "Break First: an orchestrator + coder, reviewer and tester subagents plugin for Claude Code.",
+  "description": "Break First: Claude Code plugins that attack your code before attackers do.",
   "owner": {
     "name": "Bekzod",
     "url": "https://github.com/BeKzOdHaMiDoV"
@@ -9,9 +9,9 @@
     {
       "name": "break-first",
       "source": ".",
-      "description": "Orchestrator breaks a task into steps for a coder subagent; a reviewer checks the code and a tester writes and runs unit tests; problems go back to the coder (max 2 fix rounds).",
+      "description": "Orchestrator + coder, reviewer, tester and red-team agents. Builds a feature, tests it, attacks it locally, proves each hole with a test, fixes it, re-checks.",
       "category": "productivity",
-      "tags": ["orchestrator", "subagents"]
+      "tags": ["security", "red-team", "orchestrator", "subagents"]
     }
   ]
 }
