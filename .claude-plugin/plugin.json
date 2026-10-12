@@ -2,7 +2,7 @@
   "name": "break-first",
   "displayName": "Break First",
   "version": "0.1.0",
-  "description": "An orchestrator skill for Claude Code that breaks a task into steps and hands them to a coder subagent, which writes code straight into files, then to a tester subagent, which writes and runs unit tests. Both return short reports; failures go back to the coder for at most 2 fix rounds.",
+  "description": "An orchestrator skill for Claude Code that breaks a task into steps for a coder subagent, which writes code straight into files. A read-only reviewer subagent checks that the code got better, not bigger, and a tester subagent writes and runs unit tests. All return short reports; problems go back to the coder for at most 2 fix rounds.",
   "author": {
     "name": "Bekzod",
     "url": "https://github.com/BeKzOdHaMiDoV"
