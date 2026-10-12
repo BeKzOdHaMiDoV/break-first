@@ -10,8 +10,8 @@
       "name": "break-first",
       "source": ".",
       "description": "Orchestrator breaks a task into steps and hands them to a coder subagent that writes code into files and returns a short report.",
-      "category": "security",
-      "tags": ["security", "red-team", "subagents"]
+      "category": "productivity",
+      "tags": ["orchestrator", "subagents"]
     }
   ]
 }
