@@ -32,7 +32,18 @@ Then run:
 
 ## Cost
 
-The orchestrator runs on your session's model. For routine tasks, switch to `/model sonnet` first: it is noticeably cheaper. Keep Opus for complex planning. The subagents (coder, reviewer, tester) already run on Sonnet, whatever your session model is.
+The orchestrator runs on your session's model. The subagents (coder, reviewer, tester) always run on Sonnet, whatever your session model is.
+
+Sonnet is cheaper per token, but a cheaper orchestrator doesn't always mean a cheaper run. On tasks with an ambiguous spec, an Opus orchestrator tends to write more precise briefs and saves fix rounds.
+
+In our test (one run each, same task: a console TODO list with JSON storage):
+
+| Session model | Orchestrator | Subagents | Total | Fix rounds |
+|---|---|---|---|---|
+| Opus | $0.43 | $0.14 | $0.57 | 1 |
+| Sonnet | ≈ $0.49 | ≈ $0.18 | $0.67 | 1, plus tests rewritten after a contradictory brief |
+
+The Sonnet split is estimated from token usage, since both parts ran on the same model. One run per model is not a benchmark; your results will vary.
 
 ## License
 

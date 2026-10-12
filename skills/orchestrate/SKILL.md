@@ -41,6 +41,8 @@ Show the user the plan in a few lines only if it has 3+ steps or a risky decisio
 
 For each step, call the Agent tool with `subagent_type: "break-first:coder"` and a self-contained brief containing the four fields above. The coder has no access to this conversation, so include every fact it needs, but no history it doesn't.
 
+**Before sending any brief** (coder, reviewer or tester), re-read it: requirements must not contradict each other or the user's task (e.g. "next id = max + 1" vs "ids are never reused"). Resolve a conflict before sending; if resolving it changes what the user gets, ask the user.
+
 - Run steps **in parallel** only when they touch disjoint files and don't depend on each other; otherwise run them in order.
 - Read each report. On `DONE`, run its `RUN` command yourself only if the result matters for the next step or the report looks doubtful.
 - On `PARTIAL` or `BLOCKED`, decide: answer the question and re-delegate, adjust the plan, or ask the user. Never silently drop a step.
